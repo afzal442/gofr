@@ -12,8 +12,8 @@ func main() {
 	// app.AddHTTPService("anotherService", "http://localhost:9000")
 
 	// Define routes
-	app.GET("api/social/posts", handlers.GeneratePostHandler)
-	app.POST("api/social/approve", handlers.ApprovePostHandler)
+	app.GET("/api/social/posts", handlers.GeneratePostHandler)
+	app.POST("/api/social/approve", handlers.ApprovePostHandler)
 	// app.POST("api/email/outreach", handlers.EmailOutreachHandler)
 	// app.GET("api/analytics", handlers.AnalyticsHandler)
 
