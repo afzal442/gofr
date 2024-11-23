@@ -1,14 +1,41 @@
 package utils
 
 import (
-	"log"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
 
 	"gofr.dev/pkg/gofr"
 )
 
-func PublishToSocialMedia(post string) error {
-	// Placeholder: Use LinkedIn and Twitter APIs
-	log.Println("Publishing post: ", post)
+type SocialMediaPost struct {
+	Content string `json:"content"`
+}
+
+func PublishToSocialMedia(c *gofr.Context, content string) error {
+	// Prepare the request payload
+	post := SocialMediaPost{
+		Content: content,
+	}
+
+	postData, err := json.Marshal(post)
+	if err != nil {
+		return fmt.Errorf("failed to serialize post: %w", err)
+	}
+
+	// Send the request to the mock server
+	resp, err := http.Post("http://localhost:5000/api/twitter/publish", "application/json", bytes.NewBuffer(postData))
+	if err != nil {
+		return fmt.Errorf("failed to publish post: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Check the response status
+	if resp.StatusCode != http.StatusCreated {
+		return fmt.Errorf("server returned status: %s", resp.Status)
+	}
+
 	return nil
 }
 

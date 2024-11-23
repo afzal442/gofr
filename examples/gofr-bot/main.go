@@ -14,7 +14,7 @@ func main() {
 	// Define routes
 	app.GET("/api/social/posts", handlers.GeneratePostHandler)
 	app.POST("/api/social/approve", handlers.ApprovePostHandler)
-	// app.POST("api/email/outreach", handlers.EmailOutreachHandler)
+	app.POST("/api/email/outreach", handlers.EmailOutreachHandler)
 	// app.GET("api/analytics", handlers.AnalyticsHandler)
 
 	// Run the application

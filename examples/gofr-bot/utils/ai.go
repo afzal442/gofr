@@ -3,11 +3,11 @@ package utils
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/google/generative-ai-go/genai"
-	"google.golang.org/api/iterator"
+	"gofr.dev/pkg/gofr"
+	"google.golang.org/api/option"
 )
 
 // Simulate AI-based post generation
@@ -19,34 +19,43 @@ import (
 	return post
 } */
 
-func GeneratePost(trendingTopics []string, updates string) string {
+func GeneratePost(c *gofr.Context, trendingTopics, updates string) string {
 	// Initialize GEMINI AI client
 	ctx := context.Background()
-	client, err := genai.NewClient(ctx)
+	client, err := genai.NewClient(ctx, option.WithAPIKey("AIzaSyDEeI0SxLrsfwZiN_QH3UyoJZEVM9tJjhA"))
 	if err != nil {
-		log.Fatalf("Failed to create GEMINI client: %v", err)
+		c.Errorf("Failed to create GEMINI client: %v", err)
 	}
 
 	// Prepare prompt with updates and trending topics
 	prompt := "Write a LinkedIn post about GoFr, a Go-based framework for microservices. Include: " +
 		"\n- Recent updates: " + updates +
-		"\n- Trending topics: " + strings.Join(trendingTopics, ", ") +
-		"\n- Use a friendly, professional tone with hashtags like #GoLang and #Microservices."
+		"\n- Trending topics: " + trendingTopics +
+		"\n- Use a friendly, professional tone with hashtags like #GoLang and #Microservices. and link to https://github.com/gofr-dev/gofr/releases/tag/ + realeas version"
 
 	// Use GEMINI AI to generate the content
 	model := client.GenerativeModel("gemini-1.5-flash")
-	iter := model.GenerateContentStream(ctx, genai.Text(prompt))
+	resp, err := model.GenerateContent(ctx, genai.Text(prompt))
+	if err != nil {
+		c.Error(err)
+	}
 
 	var postBuilder strings.Builder
-	for {
-		resp, err := iter.Next()
-		if err == iterator.Done {
-			break
+
+	if resp == nil {
+		c.Error("Empty response from GEMINI AI")
+		return ""
+	}
+
+	// Iterate through candidates in the response
+	for _, cand := range resp.Candidates {
+		if cand.Content != nil {
+			for _, part := range cand.Content.Parts {
+				// Convert part to string dynamically if it doesn't have a direct string field
+				partStr := fmt.Sprintf("%v", part) // Replace this with the correct field/method if available
+				postBuilder.WriteString(partStr)
+			}
 		}
-		if err != nil {
-			log.Fatalf("Error generating content: %v", err)
-		}
-		postBuilder.WriteString(resp.PromptFeedback.BlockReason.String())
 	}
 
 	// Return the generated post
@@ -54,6 +63,10 @@ func GeneratePost(trendingTopics []string, updates string) string {
 }
 
 // Simulate email content generation
-func GenerateEmail(recipient string, trendingTopics []string, updates string) string {
-	return fmt.Sprintf("Hi %s,\n\nExplore the power of GoFr for microservices!\n%s\n\nBest,\nThe GoFr Team", recipient, updates)
+func GenerateEmail(recipient string, trendingTopics, updates string) string {
+	parts := strings.Split(recipient, "@")
+	/* 	if len(parts) != 2 {
+		return "invalid email format"
+	} */
+	return fmt.Sprintf("Hi %s,\n\nExplore the power of GoFr for microservices!\n%s\n\nBest,\nThe GoFr Team", parts[0], updates)
 }

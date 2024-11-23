@@ -20,3 +20,5 @@ gofr-bot/
 │   └── config.go         # Environment variables
 ├── .env                  # API keys and secrets
 └── go.mod                # Go modules
+
+docker run --name gofr-redis -p 2002:6379 -d redis
