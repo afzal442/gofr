@@ -53,7 +53,7 @@ func SendEmail(c *gofr.Context, subject, recipient, content string) error {
 
 // Mock email addresses to store in Redis
 var emailAddresses = []string{
-	"tempnobs@gmail.com",
+	"afvn.in@gmail.com",
 	/* "developer1@example.com",
 	"team@techcompany.com",
 	"golangdev@openmail.com",
@@ -83,7 +83,6 @@ func FetchTargetRecipients(c *gofr.Context) []string {
 	}
 
 	// Shuffle and pick a random subset of emails to return
-	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(emails), func(i, j int) { emails[i], emails[j] = emails[j], emails[i] })
 
 	// Limit the number of recipients returned

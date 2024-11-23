@@ -11,14 +11,18 @@ import (
 func EmailOutreachHandler(c *gofr.Context) (interface{}, error) {
 	recipients := utils.FetchTargetRecipients(c)   // Fetch target emails
 	trendingTopics := utils.FetchTrendingTopics(c) // Get trending topics
-	gofrUpdates, err := utils.FetchgofrUpdates(c)  // GoFr updates
+	gofrpost, err := utils.GetDraftFromRedis(c, "social_post")
+	if err != nil {
+		return nil, err
+	}
+	// gofrUpdates, err := utils.FetchgofrUpdates(c)  // GoFr updates
 
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch updates: %w", err)
 	}
 
 	for _, recipient := range recipients {
-		email := utils.GenerateEmail(recipient, trendingTopics, gofrUpdates)
+		email := utils.GenerateEmail(recipient, trendingTopics, gofrpost)
 		err := utils.SendEmail(c, trendingTopics, recipient, email)
 		if err != nil {
 			return nil, err
