@@ -4,12 +4,36 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"net/http"
 
 	"gofr.dev/pkg/gofr"
 )
 
 // FetchTrendingTopics fetches a random trending topic from the mock server
+
+// MockTrendingTopics is the list of mock topics we return from our mock server.
+var MockTrendingTopics = []string{
+	"Latest in Go",
+	"GoFr Framework Release",
+	"GoFr vs Fiber",
+	"Golang HTTP service Simplified",
+	"Microservices Best Practices",
+	"Go datasource",
+	"Go Performance Tuning",
+	"Serverless Architecture Trends",
+}
+
+// TrendingHandler will return a random topic from our mock list of topics.
+func TrendingHandler(c *gofr.Context) (interface{}, error) {
+	// Select a random trending topic
+	randomIndex := rand.Intn(len(MockTrendingTopics))
+	topic := MockTrendingTopics[randomIndex]
+
+	// Return the selected topic as a JSON response
+	return topic, nil
+}
+
 func FetchTrendingTopics(c *gofr.Context) string {
 	// Send a request to the mock server to fetch trending topics
 	resp, err := http.Get("http://localhost:5000/api/twitter/trending")
@@ -19,14 +43,30 @@ func FetchTrendingTopics(c *gofr.Context) string {
 	}
 	defer resp.Body.Close()
 
-	// Decode the response into a slice of strings
-	var topics string
-	if err := c.Bind(&topics); err != nil {
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		c.Errorf("Failed to read response body: %v", err)
+		return "GoFr Latest Update"
+	}
+
+	// Define a map to hold the response
+	var result map[string]interface{}
+
+	// Decode the response body into the map
+	if err := json.Unmarshal(body, &result); err != nil {
 		c.Errorf("Failed to decode trending topics: %v", err)
 		return "GoFr Latest Update"
 	}
 
-	return topics
+	// Extract the 'data' field from the map and assert it as a string
+	topic, ok := result["data"].(string)
+	if !ok {
+		c.Errorf("Failed to extract 'data' from the response")
+		return "GoFr Latest Update"
+	}
+
+	return topic
 }
 
 type GitHubRelease struct {

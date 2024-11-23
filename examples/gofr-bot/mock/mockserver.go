@@ -34,7 +34,7 @@ func MockPublishHandler(c *gofr.Context) (interface{}, error) {
 	return response, nil
 }
 
-// MockTrendingTopics contains a list of mock trending topics
+// MockTrendingTopics is the list of mock topics we return from our mock server.
 var MockTrendingTopics = []string{
 	"Latest in Go",
 	"GoFr Framework Release",
@@ -46,7 +46,7 @@ var MockTrendingTopics = []string{
 	"Serverless Architecture Trends",
 }
 
-// TrendingHandler returns a random trending topic from the mock list
+// TrendingHandler will return a random topic from our mock list of topics.
 func TrendingHandler(c *gofr.Context) (interface{}, error) {
 	// Select a random trending topic
 	randomIndex := rand.Intn(len(MockTrendingTopics))

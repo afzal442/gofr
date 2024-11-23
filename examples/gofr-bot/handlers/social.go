@@ -12,7 +12,6 @@ func GeneratePostHandler(c *gofr.Context) (interface{}, error) {
 	trendingTopics := utils.FetchTrendingTopics(c) // Get trending topics
 	gofrUpdates, err := utils.FetchgofrUpdates(c)  // Pull GoFr updates
 
-	c.Log(trendingTopics)
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch updates: %w", err)
 	}
