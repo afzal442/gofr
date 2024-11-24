@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Chatbox Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="bg-white shadow-lg rounded-lg w-full max-w-2xl">
+        <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="text-xl font-semibold text-gray-800">Chatbox</h2>
+            <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+        <div class="p-4">
+            <div class="mb-4 text-center">
+                <p class="text-gray-700">Create a GoFr post</p>
+            </div>
+            <div class="space-y-2 flex flex-col items-center">
+                <button class="w-1/2 py-1.5 px-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex items-center justify-center text-sm" onclick="getTwitterPosts()">
+                    <i class="fab fa-twitter mr-2"></i>Fetch Twitter Post
+                </button>
+                <button class="w-1/2 py-1.5 px-3 bg-blue-400 text-white rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 flex items-center justify-center text-sm" onclick="getLinkedInPosts()">
+                    <i class="fab fa-linkedin mr-2"></i>Fetch LinkedIn Post
+                </button>
+                <button class="w-1/2 py-1.5 px-3 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 flex items-center justify-center text-sm" onclick="approvePost()">
+                    <i class="fas fa-check mr-2"></i>Approve Post
+                </button>
+                <button class="w-1/2 py-1.5 px-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 flex items-center justify-center text-sm" onclick="sendOutreachEmail()">
+                    <i class="fas fa-envelope mr-2"></i>Send Outreach Email
+                </button>
+            </div>
+        </div>
+        <div class="p-4 border-t border-gray-200">
+            <div class="flex items-center space-x-2">
+                <input type="text" id="messageInput" class="w-full py-2 px-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Type your message...">
+                <button class="py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" onclick="sendMessage()">
+                    Send
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const API_BASE_URL = "http://localhost:9000/api/social";
+
+        // Fetch Twitter Post
+        async function getTwitterPosts() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/posts`, {
+                    method: "GET",
+                });
+                const data = await response.json();
+                alert(`Twitter Post: ${data.data.draft}`);
+            } catch (error) {
+                console.error("Error fetching Twitter posts:", error);
+                alert("Failed to fetch Twitter posts.");
+            }
+        }
+
+        // Fetch LinkedIn Post (Reusing the same endpoint for demonstration purposes)
+        async function getLinkedInPosts() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/posts`, {
+                    method: "GET",
+                });
+                const data = await response.json();
+                alert(`LinkedIn Post: ${data.data.draft}`);
+            } catch (error) {
+                console.error("Error fetching LinkedIn posts:", error);
+                alert("Failed to fetch LinkedIn posts.");
+            }
+        }
+
+        // Approve Post
+        async function approvePost() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/approve`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ approve: true }),
+                });
+                const data = await response.json();
+                alert(data.data.status);
+            } catch (error) {
+                console.error("Error approving post:", error);
+                alert("Failed to approve the post.");
+            }
+        }
+
+        // Send Outreach Email
+        async function sendOutreachEmail() {
+            try {
+                const response = await fetch(`http://localhost:9000/api/email/outreach`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        subject: "GoFr Updates",
+                        body: "Check out the latest features of GoFr!",
+                        recipient: "team@example.com",
+                    }),
+                });
+                const data = await response.json();
+                alert(data.data.status);
+            } catch (error) {
+                console.error("Error sending outreach email:", error);
+                alert("Failed to send outreach emails.");
+            }
+        }
+
+        // Send message (Example function)
+        function sendMessage() {
+            const message = document.getElementById("messageInput").value;
+            if (message.trim() === "") {
+                alert("Please type a message first!");
+                return;
+            }
+            alert("Message sent: " + message);
+        }
+    </script>
+</body>
+</html>
